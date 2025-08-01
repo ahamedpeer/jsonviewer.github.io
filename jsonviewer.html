@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Formatter with Monetization | GitHub Pages Ready</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #4a6cf7;
+            --primary-dark: #3451b2;
+            --secondary: #6c757d;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --dark: #343a40;
+            --light: #f8f9fa;
+            --bg: #1e1e2e;
+            --editor-bg: #2d2d3a;
+            --text: #e1e1e6;
+            --border: #44475a;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 0;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .monetization-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--warning);
+            color: #333;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #8a2387, #e94057, #f27121);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .subtitle {
+            color: #a0aec0;
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .app-container {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .panel {
+            flex: 1;
+            min-width: 300px;
+            background: rgba(30, 30, 46, 0.8);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .panel.fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1000;
+            border-radius: 0;
+            margin: 0;
+            padding: 20px;
+            max-width: none;
+            overflow: auto;
+        }
+        
+        .panel-header {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .panel-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .panel-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            background: var(--primary);
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+        
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .btn-success {
+            background: var(--success);
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+        }
+        
+        .btn-danger:hover {
+            background: #bd2130;
+        }
+        
+        .editor-container {
+            flex: 1;
+            position: relative;
+            min-height: 300px;
+        }
+        
+        #json-input {
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            background: transparent;
+            border: none;
+            color: var(--text);
+            font-family: 'Fira Code', monospace;
+            font-size: 14px;
+            resize: none;
+            outline: none;
+            line-height: 1.6;
+            tab-size: 2;
+        }
+        
+        #json-input:focus {
+            box-shadow: inset 0 0 0 2px var(--primary);
+        }
+        
+        #formatted-output {
+            padding: 20px;
+            white-space: pre;
+            font-family: 'Fira Code', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            overflow: auto;
+            min-height: 300px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        #tree-view {
+            padding: 20px;
+            font-family: 'Fira Code', monospace;
+            font-size: 14px;
+            line-height: 1.8;
+            overflow: auto;
+            min-height: 300px;
+            transition: font-size 0.3s ease;
+        }
+        
+        .tree-node {
+            margin-left: 20px;
+            position: relative;
+        }
+        
+        .tree-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 5px;
+            cursor: default;
+        }
+        
+        .tree-toggle {
+            cursor: pointer;
+            color: #4ec9b0;
+            margin-right: 5px;
+            width: 18px;
+            text-align: center;
+            font-size: 12px;
+            background: rgba(78, 201, 176, 0.1);
+            border-radius: 3px;
+            padding: 0 2px;
+        }
+        
+        .tree-key {
+            color: #4ec9b0;
+            font-weight: 500;
+            margin-right: 5px;
+        }
+        
+        .tree-value {
+            color: #dcdcaa;
+        }
+        
+        .tree-type {
+            color: #569cd6;
+            font-style: italic;
+            margin-left: 8px;
+            font-size: 0.9em;
+        }
+        
+        .tree-brace {
+            color: #d4d4d4;
+            font-weight: bold;
+        }
+        
+        .tree-content {
+            margin-left: 20px;
+            border-left: 1px dashed rgba(108, 117, 125, 0.3);
+            padding-left: 15px;
+            margin-top: 5px;
+        }
+        
+        .children-container {
+            margin-left: 20px;
+        }
+        
+        .error-container {
+            background: rgba(220, 53, 69, 0.15);
+            border-left: 4px solid var(--danger);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 6px 6px 0;
+        }
+        
+        .error-title {
+            color: var(--danger);
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .error-details {
+            font-family: monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .error-position {
+            color: var(--warning);
+            font-weight: 500;
+        }
+        
+        .suggestions {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .suggestion-title {
+            color: var(--warning);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .suggestion-list {
+            padding-left: 25px;
+        }
+        
+        .suggestion-list li {
+            margin-bottom: 6px;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+        
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 25px;
+            transition: transform 0.3s ease, background 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--primary);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        
+        .feature-title {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+        
+        .feature-desc {
+            color: var(--secondary);
+            line-height: 1.6;
+        }
+        
+        .highlight {
+            background: rgba(255, 193, 7, 0.2);
+            padding: 0 3px;
+            border-radius: 3px;
+        }
+        
+        .string { color: #ce9178; }
+        .number { color: #b5cea8; }
+        .boolean { color: #569cd6; }
+        .null { color: #569cd6; }
+        .key { color: #4ec9b0; }
+        
+        .error-marker {
+            background: rgba(220, 53, 69, 0.3);
+            position: absolute;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            color: var(--secondary);
+            font-size: 0.9rem;
+            margin-top: 40px;
+            border-top: 1px solid var(--border);
+        }
+        
+        .tree-indent {
+            display: inline-block;
+            width: 20px;
+        }
+        
+        .zoom-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: 15px;
+        }
+        
+        .zoom-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border);
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .zoom-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+        
+        .zoom-display {
+            min-width: 40px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        
+        .fullscreen-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+        
+        .fullscreen-header {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .fullscreen-content {
+            flex: 1;
+            overflow: auto;
+            padding: 20px;
+            font-size: 16px;
+        }
+        
+        .ad-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin: 20px 0;
+            border: 1px dashed var(--border);
+        }
+        
+        .ad-label {
+            font-size: 0.8rem;
+            color: var(--secondary);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .ad-content {
+            min-height: 90px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--secondary);
+            font-style: italic;
+        }
+        
+        .hosting-guide {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 40px;
+            border: 1px solid var(--border);
+        }
+        
+        .guide-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .steps {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .step {
+            display: flex;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .step:hover {
+            background: rgba(255, 255, 255, 0.07);
+            transform: translateX(5px);
+        }
+        
+        .step-number {
+            background: var(--primary);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-weight: bold;
+        }
+        
+        .step-content h3 {
+            margin-bottom: 5px;
+            color: #fff;
+        }
+        
+        .step-content p {
+            color: var(--secondary);
+            line-height: 1.6;
+        }
+        
+        .code-block {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+        }
+        
+        @media (max-width: 768px) {
+            .app-container {
+                flex-direction: column;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .panel-actions {
+                flex-wrap: wrap;
+                justify-content: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-code"></i> JSON Formatter Pro</h1>
+            <p class="subtitle">Free online JSON Formatter and Viewer</p>
+        </header>
+        
+        <div class="app-container">
+            <div class="panel">
+                <div class="panel-header">
+                    <h2 class="panel-title"><i class="fas fa-keyboard"></i> JSON Input</h2>
+                    <div class="panel-actions">
+                        <button id="minify-btn" class="btn btn-outline">
+                            <i class="fas fa-compress-alt"></i> Minify
+                        </button>
+                        <button id="clear-btn" class="btn btn-outline">
+                            <i class="fas fa-trash-alt"></i> Clear
+                        </button>
+                    </div>
+                </div>
+                <div class="editor-container">
+                    <textarea id="json-input" placeholder='Paste your JSON here...&#10;Example: { "name": "John", "age": 30, "hobbies": ["reading", "gaming"] }' spellcheck="false"></textarea>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <div class="panel-header">
+                    <h2 class="panel-title"><i class="fas fa-magic"></i> Formatted JSON</h2>
+                    <div class="panel-actions">
+                        <button id="copy-btn" class="btn btn-outline">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                        <button id="format-btn" class="btn btn-success">
+                            <i class="fas fa-broom"></i> Format
+                        </button>
+                    </div>
+                </div>
+                <pre id="formatted-output"></pre>
+            </div>
+        </div>
+        
+        <div class="panel" id="tree-panel">
+            <div class="panel-header">
+                <h2 class="panel-title"><i class="fas fa-tree"></i> JSON Tree View</h2>
+                <div class="panel-actions">
+                    <div class="zoom-controls">
+                        <div class="zoom-btn" id="zoom-out">
+                            <i class="fas fa-search-minus"></i>
+                        </div>
+                        <div class="zoom-display" id="zoom-level">100%</div>
+                        <div class="zoom-btn" id="zoom-in">
+                            <i class="fas fa-search-plus"></i>
+                        </div>
+                    </div>
+                    <button id="expand-btn" class="btn btn-outline">
+                        <i class="fas fa-plus-circle"></i> Expand All
+                    </button>
+                    <button id="collapse-btn" class="btn btn-outline">
+                        <i class="fas fa-minus-circle"></i> Collapse All
+                    </button>
+                    <button id="fullscreen-btn" class="btn btn-outline">
+                        <i class="fas fa-expand"></i> Fullscreen
+                    </button>
+                </div>
+            </div>
+            <div id="tree-view"></div>
+        </div>
+        
+        <!-- Ad Placement -->
+        <div class="ad-container">
+            <div class="ad-label">Advertisement</div>
+            <div class="ad-content">
+                [Ad Space - Your Ad Would Appear Here]
+            </div>
+        </div>
+        
+        <div id="error-container"></div>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-expand"></i>
+                </div>
+                <h3 class="feature-title">Fullscreen Tree View</h3>
+                <p class="feature-desc">Toggle fullscreen mode to explore large JSON structures with better visibility.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-search-plus"></i>
+                </div>
+                <h3 class="feature-title">Zoom Controls</h3>
+                <p class="feature-desc">Adjust text size with zoom controls to focus on details or see the entire structure.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-sitemap"></i>
+                </div>
+                <h3 class="feature-title">Interactive Tree</h3>
+                <p class="feature-desc">Expand/collapse nodes to navigate complex JSON structures with intuitive controls.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <h3 class="feature-title">Easy Debugging</h3>
+                <p class="feature-desc">Easy to troubleshoot and fix the json.</p>
+            </div>
+        </div>
+        
+        <!-- Hosting Guide 
+        <div class="hosting-guide">
+            <h2 class="guide-title"><i class="fab fa-github"></i> GitHub Pages Hosting Guide</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Create a GitHub Account</h3>
+                        <p>If you don't have one, sign up at <a href="https://github.com/" target="_blank" style="color: var(--primary);">github.com</a></p>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Create a New Repository</h3>
+                        <p>Click the "+" icon in the top right corner and select "New repository"</p>
+                        <div class="code-block">Repository name: yourusername.github.io</div>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Upload Your Files</h3>
+                        <p>Upload this HTML file to your repository:</p>
+                        <div class="code-block">
+                            - Click "Add file" → "Upload files"<br>
+                            - Drag and drop your HTML file<br>
+                            - Commit changes
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h3>Enable GitHub Pages</h3>
+                        <p>Go to repository Settings → Pages section</p>
+                        <div class="code-block">
+                            Branch: main (or master)<br>
+                            Folder: / (root)<br>
+                            Click Save
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h3>Access Your Live Site</h3>
+                        <p>Your JSON formatter will be live at:</p>
+                        <div class="code-block">https://yourusername.github.io</div>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">6</div>
+                    <div class="step-content">
+                        <h3>Set Up Monetization</h3>
+                        <p>Add your AdSense code to the designated ad container areas</p>
+                        <div class="code-block">
+                            &lt;!-- Replace ad-content div with your AdSense code --&gt;<br>
+                            &lt;script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_ID" crossorigin="anonymous"&gt;&lt;/script&gt;
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+      Second Ad Placement -->
+        <div class="ad-container">
+            <div class="ad-label">Advertisement</div>
+            <div class="ad-content">
+                [Ad Space - Your Ad Would Appear Here]
+            </div>
+        </div>
+        
+        <footer>
+            <p>Created with ❤️ | JSON Formatter Pro | Ready for GitHub Pages | <a href="#" style="color: var(--primary);">Privacy Policy</a></p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM elements
+            const jsonInput = document.getElementById('json-input');
+            const formattedOutput = document.getElementById('formatted-output');
+            const treeView = document.getElementById('tree-view');
+            const errorContainer = document.getElementById('error-container');
+            const formatBtn = document.getElementById('format-btn');
+            const minifyBtn = document.getElementById('minify-btn');
+            const clearBtn = document.getElementById('clear-btn');
+            const copyBtn = document.getElementById('copy-btn');
+            const expandBtn = document.getElementById('expand-btn');
+            const collapseBtn = document.getElementById('collapse-btn');
+            const fullscreenBtn = document.getElementById('fullscreen-btn');
+            const treePanel = document.getElementById('tree-panel');
+            const zoomInBtn = document.getElementById('zoom-in');
+            const zoomOutBtn = document.getElementById('zoom-out');
+            const zoomLevel = document.getElementById('zoom-level');
+            
+            // Zoom state
+            let zoom = 100;
+            
+            // Sample JSON with nested structures for demo
+            const sampleJson = `{
+    "appName": "JSON Formatter Pro",
+    "version": "1.0.0",
+    "features": ["Formatting", "Validation", "Tree View", "Monetization"],
+    "hosting": "GitHub Pages",
+    "monetization": {
+        "adSlots": 2,
+        "analytics": "Google Analytics"
+    },
+    "author": {
+        "name": "Your Name",
+        "website": "https://yourwebsite.com"
+    }
+}`;
+            
+            // Initialize with sample JSON
+            jsonInput.value = sampleJson;
+            formatJSON();
+            
+            // Event listeners
+            formatBtn.addEventListener('click', formatJSON);
+            minifyBtn.addEventListener('click', minifyJSON);
+            clearBtn.addEventListener('click', clearInput);
+            copyBtn.addEventListener('click', copyOutput);
+            expandBtn.addEventListener('click', expandTree);
+            collapseBtn.addEventListener('click', collapseTree);
+            jsonInput.addEventListener('input', debounce(formatJSON, 500));
+            fullscreenBtn.addEventListener('click', toggleFullscreen);
+            zoomInBtn.addEventListener('click', zoomIn);
+            zoomOutBtn.addEventListener('click', zoomOut);
+            
+            // Add event delegation for tree toggles
+            treeView.addEventListener('click', function(e) {
+                if (e.target.classList.contains('tree-toggle')) {
+                    const toggle = e.target;
+                    const childrenContainer = toggle.closest('.tree-node').querySelector('.children-container');
+                    
+                    if (toggle.textContent === '-') {
+                        toggle.textContent = '+';
+                        if (childrenContainer) childrenContainer.style.display = 'none';
+                    } else {
+                        toggle.textContent = '-';
+                        if (childrenContainer) childrenContainer.style.display = 'block';
+                    }
+                }
+            });
+            
+            // Format JSON function
+            function formatJSON() {
+                errorContainer.innerHTML = '';
+                const input = jsonInput.value.trim();
+                
+                if (!input) {
+                    formattedOutput.textContent = '';
+                    treeView.innerHTML = '';
+                    return;
+                }
+                
+                try {
+                    // Parse and re-stringify with formatting
+                    const parsed = JSON.parse(input);
+                    const formatted = JSON.stringify(parsed, null, 2);
+                    formattedOutput.innerHTML = syntaxHighlight(formatted);
+                    renderTreeView(parsed);
+                    
+                    // Track formatting event (analytics)
+                    trackEvent('format_json', {
+                        input_length: input.length,
+                        formatted_length: formatted.length
+                    });
+                } catch (error) {
+                    handleError(error, input);
+                }
+            }
+            
+            // Minify JSON
+            function minifyJSON() {
+                errorContainer.innerHTML = '';
+                const input = jsonInput.value.trim();
+                
+                if (!input) return;
+                
+                try {
+                    const parsed = JSON.parse(input);
+                    const minified = JSON.stringify(parsed);
+                    jsonInput.value = minified;
+                    formattedOutput.innerHTML = syntaxHighlight(minified);
+                    renderTreeView(parsed);
+                    
+                    // Track minify event
+                    trackEvent('minify_json', {
+                        original_length: input.length,
+                        minified_length: minified.length
+                    });
+                } catch (error) {
+                    handleError(error, input);
+                }
+            }
+            
+            // Clear input
+            function clearInput() {
+                jsonInput.value = '';
+                formattedOutput.textContent = '';
+                treeView.innerHTML = '';
+                errorContainer.innerHTML = '';
+                
+                // Track clear event
+                trackEvent('clear_input');
+            }
+            
+            // Copy output to clipboard
+            function copyOutput() {
+                const text = formattedOutput.textContent;
+                if (!text) return;
+                
+                navigator.clipboard.writeText(text).then(() => {
+                    const originalText = copyBtn.innerHTML;
+                    copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                    setTimeout(() => {
+                        copyBtn.innerHTML = originalText;
+                    }, 2000);
+                    
+                    // Track copy event
+                    trackEvent('copy_output', {
+                        length: text.length
+                    });
+                });
+            }
+            
+            // Expand all tree nodes
+            function expandTree() {
+              
+                const toggles = treeView.querySelectorAll('.tree-toggle');
+                toggles.forEach(toggle => {
+                    toggle.textContent = '-';
+                    const childrenContainer = toggle.closest('.tree-node').querySelector('.children-container');
+                    if (childrenContainer) childrenContainer.style.display = 'block';
+                });
+                
+                // Track expand event
+                trackEvent('expand_all');
+            }
+            
+            // Collapse all tree nodes
+            function collapseTree() {
+             
+                const toggles = treeView.querySelectorAll('.tree-toggle');
+                toggles.forEach(toggle => {
+                    toggle.textContent = '+';
+                    const childrenContainer = toggle.closest('.tree-node').querySelector('.children-container');
+                    if (childrenContainer) childrenContainer.style.display = 'none';
+                });
+                
+                // Track collapse event
+                trackEvent('collapse_all');
+            }
+            
+            // Toggle fullscreen
+            function toggleFullscreen() {
+                treePanel.classList.toggle('fullscreen');
+                
+                if (treePanel.classList.contains('fullscreen')) {
+                    fullscreenBtn.innerHTML = '<i class="fas fa-compress"></i> Exit Fullscreen';
+                    treeView.style.maxHeight = 'calc(100vh - 100px)';
+                    treeView.style.overflow = 'auto';
+                    
+                    // Track fullscreen event
+                    trackEvent('enter_fullscreen');
+                } else {
+                    fullscreenBtn.innerHTML = '<i class="fas fa-expand"></i> Fullscreen';
+                    treeView.style.maxHeight = '';
+                    treeView.style.overflow = '';
+                    
+                    // Track exit fullscreen event
+                    trackEvent('exit_fullscreen');
+                }
+            }
+            
+            // Zoom in
+            function zoomIn() {
+                zoom += 10;
+                if (zoom > 200) zoom = 200;
+                updateZoom();
+            }
+            
+            // Zoom out
+            function zoomOut() {
+                zoom -= 10;
+                if (zoom < 50) zoom = 50;
+                updateZoom();
+            }
+            
+            // Update zoom
+            function updateZoom() {
+                treeView.style.fontSize = `${zoom}%`;
+                zoomLevel.textContent = `${zoom}%`;
+                
+                // Track zoom event
+                trackEvent('zoom_change', { level: zoom });
+            }
+            
+            // Track events (simulated analytics)
+            function trackEvent(eventName, params = {}) {
+                // In a real implementation, this would send data to Google Analytics
+                console.log(`Tracking event: ${eventName}`, params);
+
+               //  logEvent(analytics, eventName, params);
+                
+                // Simulated GA implementation
+                // gtag('event', eventName, params);
+            }
+            
+            // Syntax highlighting for JSON
+            function syntaxHighlight(json) {
+                json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+                    let cls = 'number';
+                    if (/^"/.test(match)) {
+                        if (/:$/.test(match)) {
+                            cls = 'key';
+                        } else {
+                            cls = 'string';
+                        }
+                    } else if (/true|false/.test(match)) {
+                        cls = 'boolean';
+                    } else if (/null/.test(match)) {
+                        cls = 'null';
+                    }
+                    return '<span class="' + cls + '">' + match + '</span>';
+                });
+            }
+            
+            // Render tree view
+            function renderTreeView(data) {
+                treeView.innerHTML = '';
+                const rootNode = document.createElement('div');
+                rootNode.className = 'tree-node';
+                
+                // Determine if root is array or object
+                const isArray = Array.isArray(data);
+                const type = isArray ? 'array' : typeof data;
+                const keys = isArray ? Array(data.length).fill().map((_, i) => i) : Object.keys(data);
+                
+                // Create root element
+                const rootItem = document.createElement('div');
+                rootItem.className = 'tree-item';
+                
+                const rootToggle = document.createElement('span');
+                rootToggle.className = 'tree-toggle';
+                rootToggle.textContent = '-';
+                
+                const rootBrace = document.createElement('span');
+                rootBrace.className = 'tree-brace';
+                rootBrace.textContent = isArray ? '[' : '{';
+                
+                const rootType = document.createElement('span');
+                rootType.className = 'tree-type';
+                rootType.textContent = isArray ? `Array (${keys.length} items)` : `Object (${keys.length} properties)`;
+                
+                rootItem.appendChild(rootToggle);
+                rootItem.appendChild(rootBrace);
+                rootItem.appendChild(rootType);
+                
+                // Create children container
+                const childrenContainer = document.createElement('div');
+                childrenContainer.className = 'children-container';
+                
+                keys.forEach(key => {
+                    const value = data[key];
+                    childrenContainer.appendChild(createTreeNode(value, key));
+                });
+                
+                // Closing brace
+                const closingBrace = document.createElement('div');
+                closingBrace.className = 'tree-item';
+                closingBrace.innerHTML = `<span class="tree-brace">${isArray ? ']' : '}'}</span>`;
+                childrenContainer.appendChild(closingBrace);
+                
+                rootNode.appendChild(rootItem);
+                rootNode.appendChild(childrenContainer);
+                
+                treeView.appendChild(rootNode);
+            }
+            
+            // Create tree node (recursive function for nested structures)
+            function createTreeNode(data, key) {
+                const node = document.createElement('div');
+                node.className = 'tree-node';
+                
+                const item = document.createElement('div');
+                item.className = 'tree-item';
+                
+                // Determine data type
+                const isArray = Array.isArray(data);
+                const type = isArray ? 'array' : typeof data;
+                const isComplex = type === 'object' || type === 'array';
+                const keys = isComplex ? (isArray ? Array(data.length).fill().map((_, i) => i) : Object.keys(data)) : [];
+                
+                // Create toggle for complex types
+                if (isComplex) {
+                    const toggle = document.createElement('span');
+                    toggle.className = 'tree-toggle';
+                    toggle.textContent = '-';
+                    item.appendChild(toggle);
+                } else {
+                    const spacer = document.createElement('span');
+                    spacer.className = 'tree-toggle';
+                    spacer.style.visibility = 'hidden';
+                    spacer.textContent = '+';
+                    item.appendChild(spacer);
+                }
+                
+                // Add key
+                const keySpan = document.createElement('span');
+                keySpan.className = 'tree-key';
+                keySpan.textContent = key + ':';
+                item.appendChild(keySpan);
+                
+                // Handle different data types
+                if (isComplex) {
+                    const brace = document.createElement('span');
+                    brace.className = 'tree-brace';
+                    brace.textContent = isArray ? '[' : '{';
+                    item.appendChild(brace);
+                    
+                    const typeSpan = document.createElement('span');
+                    typeSpan.className = 'tree-type';
+                    typeSpan.textContent = isArray ? `Array (${keys.length} items)` : `Object (${keys.length} properties)`;
+                    item.appendChild(typeSpan);
+                    
+                    node.appendChild(item);
+                    
+                    // Create children container
+                    const childrenContainer = document.createElement('div');
+                    childrenContainer.className = 'children-container';
+                    
+                    keys.forEach(k => {
+                        childrenContainer.appendChild(createTreeNode(data[k], k));
+                    });
+                    
+                    // Closing brace
+                    const closingBrace = document.createElement('div');
+                    closingBrace.className = 'tree-item';
+                    closingBrace.innerHTML = `<span class="tree-brace">${isArray ? ']' : '}'}</span>`;
+                    childrenContainer.appendChild(closingBrace);
+                    
+                    node.appendChild(childrenContainer);
+                } else {
+                    const valueSpan = document.createElement('span');
+                    valueSpan.className = 'tree-value';
+                    
+                    if (type === 'string') {
+                        valueSpan.textContent = `"${data}"`;
+                    } else if (data === null) {
+                        valueSpan.textContent = 'null';
+                    } else {
+                        valueSpan.textContent = data;
+                    }
+                    
+                    const typeSpan = document.createElement('span');
+                    typeSpan.className = 'tree-type';
+                    typeSpan.textContent = `(${type})`;
+                    
+                    item.appendChild(valueSpan);
+                    item.appendChild(typeSpan);
+                    node.appendChild(item);
+                }
+                
+                return node;
+            }
+            
+            // Handle JSON errors
+            function handleError(error, input) {
+                // Clear previous results
+                formattedOutput.textContent = 'Invalid JSON!';
+                treeView.innerHTML = '';
+                
+                // Create error container
+                const errorHtml = `
+                    <div class="error-container">
+                        <div class="error-title">
+                            <i class="fas fa-exclamation-circle"></i>
+                            JSON Parsing Error
+                        </div>
+                        <div class="error-details">
+                            ${error.message}
+                        </div>
+                        <div class="suggestions">
+                            <div class="suggestion-title">
+                                <i class="fas fa-lightbulb"></i>
+                                Suggestions
+                            </div>
+                            <ul class="suggestion-list">
+                                ${generateSuggestions(error, input)}
+                            </ul>
+                        </div>
+                    </div>
+                `;
+                
+                errorContainer.innerHTML = errorHtml;
+                
+                // Highlight error position
+                const match = error.message.match(/position (\d+)/);
+                if (match) {
+                    const errorPos = parseInt(match[1]);
+                    highlightErrorPosition(errorPos);
+                
+                
+                // Track error event
+                trackEvent('json_error', {
+                    message: error.message,
+                    position: errorPos || -1
+                });
+            }
+            }
+            
+            // Highlight error position in input
+            function highlightErrorPosition(position) {
+                // Create a temporary element to calculate line and column
+                const temp = document.createElement('div');
+                temp.style.whiteSpace = 'pre-wrap';
+                temp.style.fontFamily = 'monospace';
+                temp.style.visibility = 'hidden';
+                temp.style.position = 'absolute';
+                temp.style.width = jsonInput.offsetWidth + 'px';
+                temp.style.padding = window.getComputedStyle(jsonInput).padding;
+                temp.style.lineHeight = window.getComputedStyle(jsonInput).lineHeight;
+                temp.style.fontSize = window.getComputedStyle(jsonInput).fontSize;
+                document.body.appendChild(temp);
+                
+                // Get text up to the error position
+                const text = jsonInput.value.substring(0, position);
+                temp.textContent = text;
+                
+                // Get the line number and position
+                const lines = text.split('\n');
+                const lineNum = lines.length;
+                const colNum = lines[lines.length - 1].length;
+                
+                // Remove temp element
+                document.body.removeChild(temp);
+                
+                // Highlight the error line
+                const errorHtml = `
+                    <div style="position: absolute; top: ${(lineNum - 1) * 1.6}em; left: 0; right: 0; background: rgba(220, 53, 69, 0.15);"></div>
+                `;
+                
+                const marker = document.createElement('div');
+                marker.innerHTML = errorHtml;
+                marker.style.position = 'absolute';
+                marker.style.top = '0';
+                marker.style.left = '0';
+                marker.style.right = '0';
+                marker.style.bottom = '0';
+                marker.style.pointerEvents = 'none';
+                
+                const editorContainer = jsonInput.parentElement;
+                editorContainer.style.position = 'relative';
+                editorContainer.appendChild(marker);
+                
+                // Scroll to error position
+                jsonInput.focus();
+                jsonInput.setSelectionRange(position, position);
+                
+                // Remove marker after 5 seconds
+                setTimeout(() => {
+                    if (marker.parentElement) {
+                        marker.parentElement.removeChild(marker);
+                    }
+                }, 5000);
+            }
+            
+            // Generate error suggestions
+            function generateSuggestions(error, input) {
+                const suggestions = [];
+                
+                // Check for common errors
+                if (error.message.includes('Unexpected token')) {
+                    suggestions.push('Check for missing commas between properties');
+                    suggestions.push('Ensure all strings are properly quoted');
+                    suggestions.push('Verify that brackets and braces are balanced');
+                }
+                
+                if (error.message.includes('Unexpected end')) {
+                    suggestions.push('Check for missing closing brackets or braces');
+                    suggestions.push('Verify that all opened quotes are closed');
+                }
+                
+                if (error.message.includes('Unexpected number')) {
+                    suggestions.push('Check for missing commas between numeric values');
+                    suggestions.push('Verify that numbers are not quoted (unless they are strings)');
+                }
+                
+                // Check for trailing commas
+                if (input.match(/,\s*[}\]]/)) {
+                    suggestions.push('Remove trailing commas before closing brackets or braces');
+                }
+                
+                // Check for missing quotes
+                if (input.match(/([{,]\s*[a-zA-Z_][a-zA-Z0-9_]*\s*:)/)) {
+                    suggestions.push('Add quotes around property names (e.g., "property": value)');
+                }
+                
+                // Add general suggestions if none specific found
+                if (suggestions.length === 0) {
+                    suggestions.push('Validate your JSON structure using a linter');
+                    suggestions.push('Start with a simple structure and build complexity gradually');
+                    suggestions.push('Use a JSON validator tool to identify issues');
+                }
+                
+                return suggestions.map(s => `<li>${s}</li>`).join('');
+            }
+            
+            // Debounce function
+            function debounce(func, wait) {
+                let timeout;
+                return function() {
+                    const context = this;
+                    const args = arguments;
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => {
+                        func.apply(context, args);
+                    }, wait);
+                };
+            }
+        });
+    </script>
+
+</body>
+</html>
